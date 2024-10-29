@@ -1,16 +1,40 @@
 import PieceModel from './PieceModel';
 
+import { CoordinateModel } from './CoordinateModel';
+
+const columnNotation: Record<number, string> = {
+    0: 'a',
+    1: 'b',
+    2: 'c',
+    3: 'd',
+    4: 'e',
+    5: 'f',
+    6: 'g',
+    7: 'h',
+};
+
 export default class SquareModel {
-    readonly row: number;
-    readonly column: number;
-    piece: PieceModel;
+    coordinates: CoordinateModel;
+    piece: PieceModel | null;
 
     constructor(row: number, column: number) {
-        this.row = row;
-        this.column = column;
+        this.coordinates = { row, column };
+        this.piece = null;
     }
 
-    setPiece(piece: PieceModel) {
+    setPiece = (piece: PieceModel | null): void => {
         this.piece = piece;
-    }
+    };
+
+    getColumnCoordinates = (): string => {
+        return columnNotation[this.coordinates.column];
+    };
+
+    getRowCoordinates = (): string => {
+        return `${this.coordinates.row + 1}`;
+    };
+
+    isLightSquare = (): boolean => {
+        return (this.coordinates.column + this.coordinates.row) % 2 !== 0;
+    };
 }

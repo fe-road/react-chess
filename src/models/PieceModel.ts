@@ -9,6 +9,15 @@ export enum PieceType {
     KING = 'KING',
 }
 
+const pieceIcons = {
+    [PieceType.PAWN]: 'fa-chess-pawn',
+    [PieceType.KNIGHT]: 'fa-chess-knight',
+    [PieceType.BISHOP]: 'fa-chess-bishop',
+    [PieceType.ROOK]: 'fa-chess-rook',
+    [PieceType.QUEEN]: 'fa-chess-queen',
+    [PieceType.KING]: 'fa-chess-king',
+};
+
 export default class PieceModel {
     readonly type: PieceType;
     readonly color: PlayerColor;
@@ -17,4 +26,12 @@ export default class PieceModel {
         this.type = type;
         this.color = color;
     }
+
+    getPieceIcon = (): string => {
+        return pieceIcons[this.type];
+    };
+
+    isWhitePiece = (): boolean => {
+        return this.color === PlayerColor.WHITE;
+    };
 }
