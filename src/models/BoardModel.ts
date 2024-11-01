@@ -3,6 +3,7 @@ import SquareModel from './SquareModel';
 
 import { initialPiecePositions } from '../constants/initial-piece-positions';
 import { CoordinateModel } from './CoordinateModel';
+import { isSameCoordinate } from '../services/coordinate-service';
 
 export default class BoardModel {
     squares: Array<SquareModel> = [];
@@ -26,5 +27,9 @@ export default class BoardModel {
             (square) => square.coordinates.column === coordinate.column && square.coordinates.row === coordinate.row
         );
         this.squares[squareIndex].setPiece(piece);
+    };
+
+    getSquareOnCoordinate = (coordinate: CoordinateModel): SquareModel | undefined => {
+        return this.squares.find((item) => isSameCoordinate(item.coordinates, coordinate));
     };
 }

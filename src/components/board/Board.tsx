@@ -19,8 +19,8 @@ const Board = ({ board, playerTurn, playingAsWhite, movePiece }: Props) => {
     const [selectedSquare, setSelectedSquare] = useState<SquareModel | null>(null);
 
     const validMoves: Array<CoordinateModel> = useMemo(() => {
-        return getValidMoves(selectedSquare);
-    }, [selectedSquare]);
+        return getValidMoves(board, selectedSquare);
+    }, [board, selectedSquare]);
 
     const isValidMove = useCallback((square: SquareModel): boolean => {
         return validMoves.some(
@@ -34,7 +34,7 @@ const Board = ({ board, playerTurn, playingAsWhite, movePiece }: Props) => {
     }
 
     const selectSquare = (square: SquareModel) => {
-        if (selectedSquare) {
+        if (selectedSquare && isValidMove(square)) {
             if (!isSameAsSelectedSquare(square)) {
                 movePiece(selectedSquare, square);
             }
