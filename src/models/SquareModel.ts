@@ -1,4 +1,4 @@
-import PieceModel from './PieceModel';
+import PieceModel from './piece/PieceModel';
 
 import { CoordinateModel } from './CoordinateModel';
 

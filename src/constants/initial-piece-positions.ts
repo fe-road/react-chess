@@ -1,14 +1,14 @@
-import { PieceType } from '../models/PieceModel';
 import { PlayerColor } from '../models/PlayerModel';
+import { PieceType } from './piece-info';
 
-interface PiecePosition {
+interface InitialPiecePosition {
     rows: Array<number>;
     columns: Array<number>;
     pieceType: PieceType;
     playerColor: PlayerColor;
 }
 
-export const initialPiecePositions: Array<PiecePosition> = [
+export const initialPiecePositions: Array<InitialPiecePosition> = [
     // White
     { rows: [1], columns: [0, 1, 2, 3, 4, 5, 6, 7], pieceType: PieceType.PAWN, playerColor: PlayerColor.WHITE },
     { rows: [0], columns: [0, 7], pieceType: PieceType.ROOK, playerColor: PlayerColor.WHITE },

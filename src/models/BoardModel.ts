@@ -1,9 +1,10 @@
-import PieceModel from './PieceModel';
+import PieceModel from './piece/PieceModel';
 import SquareModel from './SquareModel';
 
 import { initialPiecePositions } from '../constants/initial-piece-positions';
 import { CoordinateModel } from './CoordinateModel';
 import { isSameCoordinate } from '../services/coordinate-service';
+import { pieceClasses } from '../constants/piece-info';
 
 export default class BoardModel {
     squares: Array<SquareModel> = [];
@@ -14,7 +15,7 @@ export default class BoardModel {
                 const square = new SquareModel(row, column);
                 initialPiecePositions.forEach((item) => {
                     if (item.rows.includes(row) && item.columns.includes(column)) {
-                        square.setPiece(new PieceModel(item.pieceType, item.playerColor));
+                        square.setPiece(new pieceClasses[item.pieceType](item.playerColor));
                     }
                 });
                 this.squares.push(square);
