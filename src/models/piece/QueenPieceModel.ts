@@ -1,7 +1,7 @@
 import { PieceType } from '../../constants/piece-info';
 import { getValidMovesForRowAndColumn } from '../../services/move-service';
 import BoardModel from '../BoardModel';
-import { CoordinateModel } from '../CoordinateModel';
+import { MoveModel } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
 import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
@@ -10,9 +10,9 @@ export default class QueenPieceModel extends PieceModel {
     constructor(color: PlayerColor) {
         super(PieceType.QUEEN, color);
     }
-    
-    getValidMoves = (board: BoardModel, square: SquareModel): Array<CoordinateModel | null> => {
-        const validMoves: Array<CoordinateModel | null> = [];
+
+    getValidMoves = (board: BoardModel, square: SquareModel): Array<MoveModel | null> => {
+        const validMoves: Array<MoveModel | null> = [];
         const { row, column } = square.coordinates;
 
         // Move within row

@@ -23,6 +23,15 @@ export const pieceIcons = {
     [PieceType.KING]: 'fa-chess-king',
 };
 
+export const pieceNotation = {
+    [PieceType.PAWN]: '',
+    [PieceType.KNIGHT]: 'N',
+    [PieceType.BISHOP]: 'B',
+    [PieceType.ROOK]: 'R',
+    [PieceType.QUEEN]: 'Q',
+    [PieceType.KING]: 'K',
+};
+
 export const pieceClasses = {
     [PieceType.PAWN]: PawnPieceModel,
     [PieceType.KNIGHT]: KnightPieceModel,

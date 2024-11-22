@@ -1,16 +1,18 @@
 import { PieceType, pieceIcons } from '../../constants/piece-info';
 import BoardModel from '../BoardModel';
-import { CoordinateModel } from '../CoordinateModel';
+import { MoveHistoryModel, MoveModel } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
 import SquareModel from '../SquareModel';
 
 export default abstract class PieceModel {
     readonly type: PieceType;
     readonly color: PlayerColor;
+    hasMoved: boolean;
 
     constructor(type: PieceType, color: PlayerColor) {
         this.type = type;
         this.color = color;
+        this.hasMoved = false;
     }
 
     getPieceIcon = (): string => {
@@ -21,5 +23,9 @@ export default abstract class PieceModel {
         return this.color === PlayerColor.WHITE;
     };
 
-    abstract getValidMoves(board: BoardModel, square: SquareModel): Array<CoordinateModel | null>;
+    setHasMoved = (newState: boolean): void => {
+        this.hasMoved = newState;
+    };
+
+    abstract getValidMoves(board: BoardModel, square: SquareModel, lastMove: MoveHistoryModel | null): Array<MoveModel | null>;
 }
