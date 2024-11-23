@@ -8,6 +8,10 @@ interface Props {
 
 const MoveHistory = ({ moveList }: Props) => {
 
+    const getBaseNormalMoveNotation = (move: MoveHistoryModel): string => {
+        return `${pieceNotation[move.piece]}${move.captured ? 'x' : ''}${columnNotation[move.to.column]}${move.to.row + 1}`;
+    };
+
     const getMoveNotation = (move: MoveHistoryModel): string => {
         if (move.type === MoveType.CASTLE_KING_SIDE) {
             return 'O-O';
@@ -15,7 +19,13 @@ const MoveHistory = ({ moveList }: Props) => {
         if (move.type === MoveType.CASTLE_QUEEN_SIDE) {
             return 'O-O-O';
         }
-        return `${pieceNotation[move.piece]}${move.captured ? 'x' : ''}${columnNotation[move.to.column]}${move.to.row + 1}`;
+        if (move.type === MoveType.PROMOTION) {
+            if (move.promotedTo) {
+                return `${getBaseNormalMoveNotation(move)}=${pieceNotation[move.promotedTo]}+`;
+            }
+            return '';
+        }
+        return getBaseNormalMoveNotation(move);
     };
 
     return (

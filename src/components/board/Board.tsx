@@ -12,11 +12,12 @@ interface Props {
     board: BoardModel;
     playerTurn: PlayerColor;
     playingAsWhite: boolean;
+    blockMoves: boolean;
     moveHistoryList: Array<MoveHistoryModel>;
     movePiece: (currentSquare: SquareModel, finalSquare: SquareModel, move: MoveModel | undefined) => void;
 }
 
-const Board = ({ board, playerTurn, playingAsWhite, moveHistoryList, movePiece }: Props) => {
+const Board = ({ board, playerTurn, playingAsWhite, blockMoves, moveHistoryList, movePiece }: Props) => {
     const [selectedSquare, setSelectedSquare] = useState<SquareModel | null>(null);
 
     const validMoves: Array<MoveModel> = useMemo(() => {
@@ -50,6 +51,10 @@ const Board = ({ board, playerTurn, playingAsWhite, moveHistoryList, movePiece }
     };
 
     const selectSquare = (square: SquareModel) => {
+        if (blockMoves) {
+            return;
+        }
+        
         if (selectedSquare && isValidMove(square)) {
             if (!isSameAsSelectedSquare(square)) {
                 movePiece(selectedSquare, square, getMove(square));

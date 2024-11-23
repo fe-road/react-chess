@@ -15,8 +15,9 @@ export interface MoveHistoryModel {
     to: CoordinateModel;
     piece: PieceType;
     color: PlayerColor;
-    captured?: PieceType;
     type: MoveType;
+    captured?: PieceType;
+    promotedTo?: PieceType;
 }
 
 export interface MoveModel extends CoordinateModel {

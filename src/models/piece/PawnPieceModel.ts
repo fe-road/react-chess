@@ -16,9 +16,20 @@ export default class PawnPieceModel extends PieceModel {
         const { row, column } = square.coordinates;
 
         if (square.piece?.color === PlayerColor.WHITE) {
-            validMoves.push(checkValidMove(board, square, { row: row + 1, column }, true).move);
-            validMoves.push(checkValidMove(board, square, { row: row + 1, column: column - 1 }, false, true).move);
-            validMoves.push(checkValidMove(board, square, { row: row + 1, column: column + 1 }, false, true).move);
+            const moveType: MoveType = row === 6 ? MoveType.PROMOTION : MoveType.NORMAL;
+            const forwardMove = checkValidMove(board, square, { row: row + 1, column }, true).move;
+            const diagonalMinusCapture = checkValidMove(board, square, { row: row + 1, column: column - 1 }, false, true).move;
+            const diagonalPlusCapture = checkValidMove(board, square, { row: row + 1, column: column + 1 }, false, true).move;
+            if (forwardMove) {
+                validMoves.push({ ...forwardMove, type: moveType });
+            }
+            if (diagonalMinusCapture) {
+                validMoves.push({ ...diagonalMinusCapture, type: moveType });
+            }
+            if (diagonalPlusCapture) {
+                validMoves.push({ ...diagonalPlusCapture, type: moveType });
+            }
+
             if (row === 1) {
                 validMoves.push(checkValidMove(board, square, { row: row + 2, column }, true).move);
             }
@@ -32,9 +43,20 @@ export default class PawnPieceModel extends PieceModel {
                 validMoves.push({ row: 5, column: lastMove.to.column, type: MoveType.EN_PASSANT });
             }
         } else {
-            validMoves.push(checkValidMove(board, square, { row: row - 1, column }, true).move);
-            validMoves.push(checkValidMove(board, square, { row: row - 1, column: column - 1 }, false, true).move);
-            validMoves.push(checkValidMove(board, square, { row: row - 1, column: column + 1 }, false, true).move);
+            const moveType: MoveType = row === 1 ? MoveType.PROMOTION : MoveType.NORMAL;
+            const forwardMove = checkValidMove(board, square, { row: row - 1, column }, true).move;
+            const diagonalMinusCapture = checkValidMove(board, square, { row: row - 1, column: column - 1 }, false, true).move;
+            const diagonalPlusCapture = checkValidMove(board, square, { row: row - 1, column: column + 1 }, false, true).move
+            if (forwardMove) {
+                validMoves.push({ ...forwardMove, type: moveType });
+            }
+            if (diagonalMinusCapture) {
+                validMoves.push({ ...diagonalMinusCapture, type: moveType });
+            }
+            if (diagonalPlusCapture) {
+                validMoves.push({ ...diagonalPlusCapture, type: moveType });
+            }
+
             if (row === 6) {
                 validMoves.push(checkValidMove(board, square, { row: row - 2, column }, true).move);
             }
