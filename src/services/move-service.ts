@@ -3,7 +3,8 @@ import BoardModel from '../models/BoardModel';
 import SquareModel from '../models/SquareModel';
 import { MoveHistoryModel, MoveModel, MoveType } from '../models/MoveModel';
 import PieceModel from '../models/piece/PieceModel';
-import { PieceType } from '../constants/piece-info';
+import { PlayerColor } from '../models/PlayerModel';
+import { PieceType } from '../models/piece/PieceType';
 
 export interface MoveCheck {
     move: MoveModel | null;
@@ -22,7 +23,40 @@ export const checkIfRookAndNotMoved = (piece: PieceModel | undefined | null): bo
     return !!piece && piece.type === PieceType.ROOK && !piece.hasMoved;
 };
 
-export const checkValidMove = (board: BoardModel, square: SquareModel, targetCoordinate: CoordinateModel, blockIfOppositeColor = false, blockIfEmpty = false): MoveCheck => {
+const getAllValidMovesForPlayer = (board: BoardModel, color: PlayerColor): Array<MoveModel> => {
+    const allMoves: Array<MoveModel> = [];
+    const allPlayerSquarePieces = board.squares.filter((square: SquareModel) => square.piece && square.piece.color === color);
+    allPlayerSquarePieces.forEach((square: SquareModel) => {
+        // allMoves.push(...getValidMoves(board, square, null));
+    });
+    return allMoves;
+}
+
+const isInCheck = (board: BoardModel, square: SquareModel, move: MoveModel | null): boolean => {
+    if (!move) return false;
+
+    const newBoard: BoardModel = new BoardModel(board);
+    newBoard.movePiece(square, newBoard.getSquareOnCoordinate({ row: move.row, column: move.column }), move);
+
+    const allOpponentValidMoves: Array<MoveModel> = getAllValidMovesForPlayer(
+        board,
+        square.piece?.isWhitePiece() ? PlayerColor.BLACK : PlayerColor.WHITE
+    );
+    if (allOpponentValidMoves.find((elem: MoveModel) => elem.givesCheck)) {
+        return true;
+    }
+
+    return false;
+}
+
+export const checkValidMove = (
+    board: BoardModel,
+    square: SquareModel,
+    targetCoordinate: CoordinateModel,
+    blockIfOppositeColor = false,
+    blockIfEmpty = false,
+    shouldVerifyCheck = true,
+): MoveCheck => {
     const moveCheck: MoveCheck = {
         move: null,
         shouldBreak: false,
@@ -32,10 +66,15 @@ export const checkValidMove = (board: BoardModel, square: SquareModel, targetCoo
     if (targetSquare?.piece) {
         if (targetSquare?.piece.color !== square.piece?.color && !blockIfOppositeColor) {
             moveCheck.move = { ...targetCoordinate, type: MoveType.NORMAL };
+            moveCheck.move.givesCheck = targetSquare?.piece.type === PieceType.KING;
         }
         moveCheck.shouldBreak = true;
     } else if (!blockIfEmpty) {
         moveCheck.move = { ...targetCoordinate, type: MoveType.NORMAL };
+    }
+
+    if (shouldVerifyCheck && isInCheck(board, square, moveCheck.move)) {
+        moveCheck.move = null;
     }
 
     return moveCheck;
@@ -70,15 +109,4 @@ export const getValidMovesForRowAndColumn = (
     }
 
     return validMoves;
-};
-
-export const getValidMoves = (board: BoardModel, square: SquareModel | null, lastMove: MoveHistoryModel | null): Array<MoveModel> => {
-    if (!square || !square?.piece) return [];
-    const { row, column } = square.coordinates;
-    const validMoves: Array<MoveModel | null> = square.piece.getValidMoves(board, square, lastMove);
-    return validMoves
-        .filter((move) => !!move)
-        .filter(
-            (move) => move.row >= 0 && move.row < 8 && move.column >= 0 && move.column < 8 && (move.row !== row || move.column !== column)
-        );
 };

@@ -1,10 +1,10 @@
-import { PieceType } from '../../constants/piece-info';
 import { getValidMovesForRowAndColumn } from '../../services/move-service';
 import BoardModel from '../BoardModel';
 import { MoveModel } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
 import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
+import { PieceType } from './PieceType';
 
 export default class RookPieceModel extends PieceModel {
     constructor(color: PlayerColor) {

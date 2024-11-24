@@ -22,4 +22,5 @@ export interface MoveHistoryModel {
 
 export interface MoveModel extends CoordinateModel {
     type: MoveType;
+    givesCheck?: boolean;
 }

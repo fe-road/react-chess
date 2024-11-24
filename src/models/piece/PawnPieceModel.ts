@@ -1,17 +1,17 @@
-import { PieceType } from '../../constants/piece-info';
 import { checkValidMove } from '../../services/move-service';
 import BoardModel from '../BoardModel';
 import { MoveHistoryModel, MoveModel, MoveType } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
 import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
+import { PieceType } from './PieceType';
 
 export default class PawnPieceModel extends PieceModel {
     constructor(color: PlayerColor) {
         super(PieceType.PAWN, color);
     }
 
-    getValidMoves = (board: BoardModel, square: SquareModel, lastMove: MoveHistoryModel | null): Array<MoveModel | null> => {
+    getValidMoves = (board: BoardModel, square: SquareModel, lastMove: MoveHistoryModel | undefined): Array<MoveModel | null> => {
         const validMoves: Array<MoveModel | null> = [];
         const { row, column } = square.coordinates;
 
@@ -46,7 +46,7 @@ export default class PawnPieceModel extends PieceModel {
             const moveType: MoveType = row === 1 ? MoveType.PROMOTION : MoveType.NORMAL;
             const forwardMove = checkValidMove(board, square, { row: row - 1, column }, true).move;
             const diagonalMinusCapture = checkValidMove(board, square, { row: row - 1, column: column - 1 }, false, true).move;
-            const diagonalPlusCapture = checkValidMove(board, square, { row: row - 1, column: column + 1 }, false, true).move
+            const diagonalPlusCapture = checkValidMove(board, square, { row: row - 1, column: column + 1 }, false, true).move;
             if (forwardMove) {
                 validMoves.push({ ...forwardMove, type: moveType });
             }

@@ -1,18 +1,10 @@
+import { PieceType } from '../models/piece/PieceType';
 import BishopPieceModel from '../models/piece/BishopPieceModel';
 import KingPieceModel from '../models/piece/KingPieceModel';
 import KnightPieceModel from '../models/piece/KnightPieceModel';
 import PawnPieceModel from '../models/piece/PawnPieceModel';
 import QueenPieceModel from '../models/piece/QueenPieceModel';
 import RookPieceModel from '../models/piece/RookPieceModel';
-
-export enum PieceType {
-    PAWN = 'PAWN',
-    KNIGHT = 'KNIGHT',
-    BISHOP = 'BISHOP',
-    ROOK = 'ROOK',
-    QUEEN = 'QUEEN',
-    KING = 'KING',
-}
 
 export const pieceIcons = {
     [PieceType.PAWN]: 'fa-chess-pawn',

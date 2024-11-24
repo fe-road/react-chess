@@ -1,28 +1,24 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import BoardModel from '../../models/BoardModel';
 import SquareModel from '../../models/SquareModel';
-import { PlayerColor } from '../../models/PlayerModel';
+import { MoveModel } from '../../models/MoveModel';
+import GameModel from '../../models/GameModel';
 
 import Square from './Square';
-import { getValidMoves } from '../../services/move-service';
-import { MoveHistoryModel, MoveModel } from '../../models/MoveModel';
 
 interface Props {
-    board: BoardModel;
-    playerTurn: PlayerColor;
+    game: GameModel;
     playingAsWhite: boolean;
     blockMoves: boolean;
-    moveHistoryList: Array<MoveHistoryModel>;
     movePiece: (currentSquare: SquareModel, finalSquare: SquareModel, move: MoveModel | undefined) => void;
 }
 
-const Board = ({ board, playerTurn, playingAsWhite, blockMoves, moveHistoryList, movePiece }: Props) => {
+const Board = ({ game, playingAsWhite, blockMoves, movePiece }: Props) => {
     const [selectedSquare, setSelectedSquare] = useState<SquareModel | null>(null);
 
     const validMoves: Array<MoveModel> = useMemo(() => {
-        return getValidMoves(board, selectedSquare, moveHistoryList.length ? moveHistoryList[moveHistoryList.length - 1] : null);
-    }, [board, selectedSquare, moveHistoryList]);
+        return game.getValidMoves(selectedSquare);
+    }, [game, selectedSquare]);
 
     const isValidMove = useCallback(
         (square: SquareModel): boolean => {
@@ -67,7 +63,7 @@ const Board = ({ board, playerTurn, playingAsWhite, blockMoves, moveHistoryList,
 
     return (
         <section className='grid grid-rows-8 grid-cols-8 w-100 mx-auto my-2 aspect-square border shadow'>
-            {board.squares.map((square: SquareModel) => (
+            {game.board.squares.map((square: SquareModel) => (
                 <div
                     key={`square_${square.coordinates.row}_${square.coordinates.column}`}
                     className={`w-full h-full col-start-${playingAsWhite ? square.coordinates.column + 1 : 8 - square.coordinates.column} row-start-${playingAsWhite ? 8 - square.coordinates.row : square.coordinates.row + 1}`}
@@ -78,7 +74,7 @@ const Board = ({ board, playerTurn, playingAsWhite, blockMoves, moveHistoryList,
                         showCoordinateRow={square.coordinates.column === 0}
                         showAsValidMove={isValidMove(square)}
                         isSelected={isSameAsSelectedSquare(square)}
-                        canSelect={square.piece?.color === playerTurn || isValidMove(square)}
+                        canSelect={square.piece?.color === game.playerTurn || isValidMove(square)}
                         select={selectSquare}
                     />
                 </div>

@@ -1,5 +1,5 @@
+import { PieceType } from '../models/piece/PieceType';
 import { PlayerColor } from '../models/PlayerModel';
-import { PieceType } from './piece-info';
 
 interface InitialPiecePosition {
     rows: Array<number>;

@@ -1,10 +1,10 @@
-import { PieceType } from '../../constants/piece-info';
 import { checkIfRookAndNotMoved, checkValidMove } from '../../services/move-service';
 import BoardModel from '../BoardModel';
 import { MoveModel, MoveType } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
 import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
+import { PieceType } from './PieceType';
 
 export default class KingPieceModel extends PieceModel {
     constructor(color: PlayerColor) {

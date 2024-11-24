@@ -1,4 +1,5 @@
-import { pieceIcons, PieceType } from '../constants/piece-info';
+import { pieceIcons } from '../constants/piece-info';
+import { PieceType } from '../models/piece/PieceType';
 
 interface Props {
     isWhitePiece: boolean;
