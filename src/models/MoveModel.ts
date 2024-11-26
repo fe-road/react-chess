@@ -1,5 +1,5 @@
-import { PieceType } from '../constants/piece-info';
 import { CoordinateModel } from './CoordinateModel';
+import { PieceType } from './piece/PieceType';
 import { PlayerColor } from './PlayerModel';
 
 export enum MoveType {

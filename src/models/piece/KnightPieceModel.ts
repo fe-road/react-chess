@@ -1,8 +1,6 @@
-import { checkValidMove } from '../../services/move-service';
-import BoardModel from '../BoardModel';
-import { MoveModel } from '../MoveModel';
+import { PossibleMove } from '../../services/move-validation-service';
+import { CoordinateModel } from '../CoordinateModel';
 import { PlayerColor } from '../PlayerModel';
-import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
 import { PieceType } from './PieceType';
 
@@ -11,20 +9,18 @@ export default class KnightPieceModel extends PieceModel {
         super(PieceType.KNIGHT, color);
     }
 
-    getValidMoves = (board: BoardModel, square: SquareModel): Array<MoveModel | null> => {
-        const validMoves: Array<MoveModel | null> = [];
-        const { row, column } = square.coordinates;
+    getMoves = (coordinates: CoordinateModel): Array<PossibleMove> => {
+        const { row, column } = coordinates;
+        return [
+            { singleConfig: { targetCoordinate: { row: row + 2, column: column + 1 } } },
+            { singleConfig: { targetCoordinate: { row: row + 2, column: column - 1 } } },
+            { singleConfig: { targetCoordinate: { row: row - 2, column: column + 1 } } },
+            { singleConfig: { targetCoordinate: { row: row - 2, column: column - 1 } } },
 
-        validMoves.push(checkValidMove(board, square, { row: row + 2, column: column + 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row + 2, column: column - 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 2, column: column + 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 2, column: column - 1 }).move);
-
-        validMoves.push(checkValidMove(board, square, { row: row + 1, column: column + 2 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row + 1, column: column - 2 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 1, column: column + 2 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 1, column: column - 2 }).move);
-
-        return validMoves;
+            { singleConfig: { targetCoordinate: { row: row + 1, column: column + 2 } } },
+            { singleConfig: { targetCoordinate: { row: row + 1, column: column - 2 } } },
+            { singleConfig: { targetCoordinate: { row: row - 1, column: column + 2 } } },
+            { singleConfig: { targetCoordinate: { row: row - 1, column: column - 2 } } },
+        ];
     };
 }

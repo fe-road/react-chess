@@ -1,8 +1,8 @@
 import { pieceIcons } from '../../constants/piece-info';
-import BoardModel from '../BoardModel';
-import { MoveHistoryModel, MoveModel } from '../MoveModel';
+import { PossibleMove } from '../../services/move-validation-service';
+import { CoordinateModel } from '../CoordinateModel';
+import { MoveHistoryModel } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
-import SquareModel from '../SquareModel';
 import { PieceType } from './PieceType';
 
 export default abstract class PieceModel {
@@ -28,5 +28,5 @@ export default abstract class PieceModel {
         this.hasMoved = newState;
     };
 
-    abstract getValidMoves(board: BoardModel, square: SquareModel, lastMove: MoveHistoryModel | undefined): Array<MoveModel | null>;
+    abstract getMoves(coordinates: CoordinateModel, lastMove: MoveHistoryModel | undefined): Array<PossibleMove>;
 }

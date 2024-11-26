@@ -1,8 +1,7 @@
-import { checkValidMove } from '../../services/move-service';
-import BoardModel from '../BoardModel';
-import { MoveHistoryModel, MoveModel, MoveType } from '../MoveModel';
+import { PossibleMove } from '../../services/move-validation-service';
+import { CoordinateModel } from '../CoordinateModel';
+import { MoveHistoryModel, MoveType } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
-import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
 import { PieceType } from './PieceType';
 
@@ -11,66 +10,48 @@ export default class PawnPieceModel extends PieceModel {
         super(PieceType.PAWN, color);
     }
 
-    getValidMoves = (board: BoardModel, square: SquareModel, lastMove: MoveHistoryModel | undefined): Array<MoveModel | null> => {
-        const validMoves: Array<MoveModel | null> = [];
-        const { row, column } = square.coordinates;
+    getMoves = (coordinates: CoordinateModel, lastMove: MoveHistoryModel | undefined): Array<PossibleMove> => {
+        const possibleMoves: Array<PossibleMove> = [];
+        const { row, column } = coordinates;
 
-        if (square.piece?.color === PlayerColor.WHITE) {
-            const moveType: MoveType = row === 6 ? MoveType.PROMOTION : MoveType.NORMAL;
-            const forwardMove = checkValidMove(board, square, { row: row + 1, column }, true).move;
-            const diagonalMinusCapture = checkValidMove(board, square, { row: row + 1, column: column - 1 }, false, true).move;
-            const diagonalPlusCapture = checkValidMove(board, square, { row: row + 1, column: column + 1 }, false, true).move;
-            if (forwardMove) {
-                validMoves.push({ ...forwardMove, type: moveType });
-            }
-            if (diagonalMinusCapture) {
-                validMoves.push({ ...diagonalMinusCapture, type: moveType });
-            }
-            if (diagonalPlusCapture) {
-                validMoves.push({ ...diagonalPlusCapture, type: moveType });
-            }
-
-            if (row === 1) {
-                validMoves.push(checkValidMove(board, square, { row: row + 2, column }, true).move);
-            }
-            if (
-                row === 4 &&
-                lastMove?.piece === PieceType.PAWN &&
-                lastMove.color === PlayerColor.BLACK &&
-                lastMove?.to.row === 4 &&
-                (lastMove?.to.column === column - 1 || lastMove?.to.column === column + 1)
-            ) {
-                validMoves.push({ row: 5, column: lastMove.to.column, type: MoveType.EN_PASSANT });
-            }
-        } else {
-            const moveType: MoveType = row === 1 ? MoveType.PROMOTION : MoveType.NORMAL;
-            const forwardMove = checkValidMove(board, square, { row: row - 1, column }, true).move;
-            const diagonalMinusCapture = checkValidMove(board, square, { row: row - 1, column: column - 1 }, false, true).move;
-            const diagonalPlusCapture = checkValidMove(board, square, { row: row - 1, column: column + 1 }, false, true).move;
-            if (forwardMove) {
-                validMoves.push({ ...forwardMove, type: moveType });
-            }
-            if (diagonalMinusCapture) {
-                validMoves.push({ ...diagonalMinusCapture, type: moveType });
-            }
-            if (diagonalPlusCapture) {
-                validMoves.push({ ...diagonalPlusCapture, type: moveType });
-            }
-
-            if (row === 6) {
-                validMoves.push(checkValidMove(board, square, { row: row - 2, column }, true).move);
-            }
-            if (
-                row === 3 &&
-                lastMove?.piece === PieceType.PAWN &&
-                lastMove.color === PlayerColor.WHITE &&
-                lastMove?.to.row === 3 &&
-                (lastMove?.to.column === column - 1 || lastMove?.to.column === column + 1)
-            ) {
-                validMoves.push({ row: 2, column: lastMove.to.column, type: MoveType.EN_PASSANT });
-            }
+        const direction = this.isWhitePiece() ? 1 : -1;
+        const startingRow = this.isWhitePiece() ? 1 : 6;
+        const moveType: MoveType = ((this.isWhitePiece() && row === 6) || (!this.isWhitePiece() && row === 1)) ? MoveType.PROMOTION : MoveType.NORMAL;
+        
+        // Normal Move
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row + (1 * direction), column }, blockIfOppositeColor: true, moveType } });
+        // Capture Moves
+        possibleMoves.push({
+            singleConfig: {
+                targetCoordinate: { row: row + 1 * direction, column: column - 1 },
+                blockIfOppositeColor: false,
+                blockIfEmpty: true,
+                moveType,
+            },
+        });
+        possibleMoves.push({
+            singleConfig: {
+                targetCoordinate: { row: row + 1 * direction, column: column + 1 },
+                blockIfOppositeColor: false,
+                blockIfEmpty: true,
+                moveType,
+            },
+        });
+        // Double Initial Move
+        if (row === startingRow) {
+            possibleMoves.push({ singleConfig: { targetCoordinate: { row: row + 2 * direction, column }, blockIfOppositeColor: true } });
         }
 
-        return validMoves;
-    };
+        // En Passant
+        if (
+            ((this.isWhitePiece() && row === 4 && lastMove?.color === PlayerColor.BLACK && lastMove?.to.row === 4) ||
+            (!this.isWhitePiece() && row === 3 && lastMove?.color === PlayerColor.WHITE && lastMove?.to.row === 3)) &&
+            lastMove?.piece === PieceType.PAWN &&
+            (lastMove?.to.column === column - 1 || lastMove?.to.column === column + 1)
+        ) {
+            possibleMoves.push({ singleConfig: { targetCoordinate: { row: row + 1 * direction, column: lastMove.to.column }, moveType: MoveType.EN_PASSANT } });
+        }
+
+        return possibleMoves;
+    }
 }

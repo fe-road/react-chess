@@ -1,8 +1,7 @@
-import { checkIfRookAndNotMoved, checkValidMove } from '../../services/move-service';
-import BoardModel from '../BoardModel';
-import { MoveModel, MoveType } from '../MoveModel';
+import { PossibleMove } from '../../services/move-validation-service';
+import { CoordinateModel } from '../CoordinateModel';
+import { MoveType } from '../MoveModel';
 import { PlayerColor } from '../PlayerModel';
-import SquareModel from '../SquareModel';
 import PieceModel from './PieceModel';
 import { PieceType } from './PieceType';
 
@@ -11,40 +10,65 @@ export default class KingPieceModel extends PieceModel {
         super(PieceType.KING, color);
     }
 
-    getValidMoves = (board: BoardModel, square: SquareModel): Array<MoveModel | null> => {
-        const validMoves: Array<MoveModel | null> = [];
-        const { row, column } = square.coordinates;
+    getMoves = (coordinates: CoordinateModel): Array<PossibleMove> => {
+        const possibleMoves: Array<PossibleMove> = [];
+        const { row, column } = coordinates;
 
-        validMoves.push(checkValidMove(board, square, { row, column: column + 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row, column: column - 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row + 1, column }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 1, column }).move);
+        // Row and Column
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row, column: column + 1 } } });
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row, column: column - 1 } } });
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row + 1, column } } });
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row - 1, column } } });
 
-        validMoves.push(checkValidMove(board, square, { row: row + 1, column: column + 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 1, column: column + 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row + 1, column: column - 1 }).move);
-        validMoves.push(checkValidMove(board, square, { row: row - 1, column: column - 1 }).move);
+        // Diagonal
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row + 1, column: column + 1 } } });
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row - 1, column: column + 1 } } });
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row + 1, column: column - 1 } } });
+        possibleMoves.push({ singleConfig: { targetCoordinate: { row: row - 1, column: column - 1 } } });
 
         // Castle
         if (!this.hasMoved) {
             const kingRow = this.isWhitePiece() ? 0 : 7;
-            // King Side
-            const squareRookKingPiece = board.getSquareOnCoordinate({ row: kingRow, column: 7 })?.piece;
-            const pieceColumn5 = board.getSquareOnCoordinate({ row: kingRow, column: 5 })?.piece;
-            const pieceColumn6 = board.getSquareOnCoordinate({ row: kingRow, column: 6 })?.piece;
-            if (checkIfRookAndNotMoved(squareRookKingPiece) && !pieceColumn5 && !pieceColumn6) {
-                validMoves.push({ row: kingRow, column: 6, type: MoveType.CASTLE_KING_SIDE });
-            }
-            // Queen Side
-            const squareRookQueenPiece = board.getSquareOnCoordinate({ row: kingRow, column: 0 })?.piece;
-            const pieceColumn1 = board.getSquareOnCoordinate({ row: kingRow, column: 1 })?.piece;
-            const pieceColumn2 = board.getSquareOnCoordinate({ row: kingRow, column: 2 })?.piece;
-            const pieceColumn3 = board.getSquareOnCoordinate({ row: kingRow, column: 3 })?.piece;
-            if (checkIfRookAndNotMoved(squareRookQueenPiece) && !pieceColumn1 && !pieceColumn2 && !pieceColumn3) {
-                validMoves.push({ row: kingRow, column: 2, type: MoveType.CASTLE_QUEEN_SIDE });
-            }
+
+            // Castle King Side
+            possibleMoves.push({
+                singleConfig: {
+                    targetCoordinate: { row: kingRow, column: 6 },
+                    mustBeNotMovedRook: [{ row: kingRow, column: 7 }],
+                    mustBeEmptyCoordinates: [
+                        { row: kingRow, column: 5 },
+                        { row: kingRow, column: 6 },
+                    ],
+                    mustNotBeInCheck: [
+                        { row: kingRow, column: 4 },
+                        { row: kingRow, column: 5 },
+                        { row: kingRow, column: 6 },
+                    ],
+                    moveType: MoveType.CASTLE_KING_SIDE,
+                },
+            });
+
+            // Castle Queen Side
+            possibleMoves.push({
+                singleConfig: {
+                    targetCoordinate: { row: kingRow, column: 2 },
+                    mustBeNotMovedRook: [{ row: kingRow, column: 0 }],
+                    mustBeEmptyCoordinates: [
+                        { row: kingRow, column: 1 },
+                        { row: kingRow, column: 2 },
+                        { row: kingRow, column: 3 },
+                    ],
+                    mustNotBeInCheck: [
+                        { row: kingRow, column: 1 },
+                        { row: kingRow, column: 2 },
+                        { row: kingRow, column: 3 },
+                        { row: kingRow, column: 4 },
+                    ],
+                    moveType: MoveType.CASTLE_QUEEN_SIDE,
+                },
+            });
         }
 
-        return validMoves;
+        return possibleMoves;
     };
 }

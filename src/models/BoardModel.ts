@@ -44,25 +44,11 @@ export default class BoardModel {
         return this.squares.find((item) => isSameCoordinate(item.coordinates, coordinate));
     };
 
-    movePiece = (currentSquare: SquareModel, finalSquare: SquareModel | undefined, move: MoveModel | undefined): void => {
+    movePiece = (currentSquare: SquareModel, finalSquare: SquareModel | undefined): void => {
         if (currentSquare && finalSquare) {
             const { piece } = currentSquare;
             this.updateSquarePiece(finalSquare.coordinates, piece);
             this.updateSquarePiece(currentSquare.coordinates, null);
-            // if (move?.type === MoveType.CASTLE_KING_SIDE) {
-            //     makeRookCastleMove(piece, 7, 5);
-            // }
-            // if (move?.type === MoveType.CASTLE_QUEEN_SIDE) {
-            //     makeRookCastleMove(piece, 0, 3);
-            // }
-            // if (move?.type === MoveType.EN_PASSANT) {
-            //     const row = piece.isWhitePiece() ? finalSquare.coordinates.row - 1 : finalSquare.coordinates.row + 1;
-            //     board.updateSquarePiece({ row, column: finalSquare.coordinates.column }, null);
-            // }
-            // if (move?.type === MoveType.PROMOTION) {
-            //     setPromotionCoordinates(finalSquare.coordinates);
-            //     return;
-            // }
         }
     };
 }

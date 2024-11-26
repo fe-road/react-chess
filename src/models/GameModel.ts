@@ -1,4 +1,5 @@
 import { pieceClasses } from '../constants/piece-info';
+import { getValidMoves } from '../services/move-validation-service';
 import BoardModel from './BoardModel';
 import { CoordinateModel } from './CoordinateModel';
 import { MoveHistoryModel, MoveModel, MoveType } from './MoveModel';
@@ -67,14 +68,14 @@ export default class GameModel {
             });
 
             piece.setHasMoved(true);
-            this.board.movePiece(currentSquare, finalSquare, move);
+            this.board.movePiece(currentSquare, finalSquare);
 
-            // if (move?.type === MoveType.CASTLE_KING_SIDE) {
-            //     makeRookCastleMove(piece, 7, 5);
-            // }
-            // if (move?.type === MoveType.CASTLE_QUEEN_SIDE) {
-            //     makeRookCastleMove(piece, 0, 3);
-            // }
+            if (move?.type === MoveType.CASTLE_KING_SIDE) {
+                this.makeRookCastleMove(piece, 7, 5);
+            }
+            if (move?.type === MoveType.CASTLE_QUEEN_SIDE) {
+                this.makeRookCastleMove(piece, 0, 3);
+            }
             // if (move?.type === MoveType.EN_PASSANT) {
             //     const row = piece.isWhitePiece() ? finalSquare.coordinates.row - 1 : finalSquare.coordinates.row + 1;
             //     board.updateSquarePiece({ row, column: finalSquare.coordinates.column }, null);
@@ -88,14 +89,6 @@ export default class GameModel {
     };
 
     getValidMoves = (square: SquareModel | null): Array<MoveModel> => {
-        if (!square || !square?.piece) return [];
-        const { row, column } = square.coordinates;
-        const validMoves: Array<MoveModel | null> = square.piece.getValidMoves(this.board, square, this.getLastMove());
-        return validMoves
-            .filter((move) => !!move)
-            .filter(
-                (move) =>
-                    move.row >= 0 && move.row < 8 && move.column >= 0 && move.column < 8 && (move.row !== row || move.column !== column)
-            );
+        return getValidMoves(this.board, square, this.getLastMove());
     };
 }
