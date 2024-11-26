@@ -13,6 +13,7 @@ export interface MoveCheck {
 
 export interface PossibleMove {
     blockCheckVerify?: boolean;
+    mustNotBeInCheck?: boolean;
     singleConfig?: SingleValidMoveCheck;
     rowColumnConfig?: RowColumnValidMoveCheck;
 }
@@ -23,9 +24,9 @@ export interface SingleValidMoveCheck {
     blockIfOppositeColor?: boolean;
     blockIfEmpty?: boolean;
     // Castle
-    mustBeNotMovedRook?: Array<CoordinateModel>;
+    mustBeNotMovedRookCoordinates?: Array<CoordinateModel>;
     mustBeEmptyCoordinates?: Array<CoordinateModel>;
-    mustNotBeInCheck?: Array<CoordinateModel>;
+    mustNotBeInCheckCoordinates?: Array<CoordinateModel>;
 }
 
 export interface RowColumnValidMoveCheck {
@@ -40,21 +41,21 @@ export const checkIfRookAndNotMoved = (piece: PieceModel | undefined | null): bo
     return !!piece && piece.type === PieceType.ROOK && !piece.hasMoved;
 };
 
-const getAllValidMovesForPlayer = (board: BoardModel, color: PlayerColor): Array<MoveModel> => {
+export const getAllValidMovesForPlayer = (board: BoardModel, color: PlayerColor, blockCheckVerify = true): Array<MoveModel> => {
     const allMoves: Array<MoveModel> = [];
     const allPlayerSquarePieces = board.squares.filter((square: SquareModel) => square.piece && square.piece.color === color);
     allPlayerSquarePieces.forEach((square: SquareModel) => {
-        const moves = getValidMoves(board, square, undefined, true);
-        allMoves.push(...moves);
+        allMoves.push(...getValidMoves(board, square, undefined, blockCheckVerify));
     });
     return allMoves;
 };
 
-const wouldBeInCheck = (board: BoardModel, square: SquareModel, move: MoveModel | null): boolean => {
-    if (!move) return false;
-
+export const wouldBeInCheck = (board: BoardModel, square: SquareModel, move: MoveModel | null): boolean => {
     const newBoard: BoardModel = new BoardModel(board);
-    newBoard.movePiece(square, newBoard.getSquareOnCoordinate({ row: move.row, column: move.column }));
+    
+    if (move) {
+        newBoard.movePiece(square, newBoard.getSquareOnCoordinate({ row: move.row, column: move.column }));
+    }
 
     const allOpponentValidMoves: Array<MoveModel> = getAllValidMovesForPlayer(
         newBoard,
@@ -75,22 +76,25 @@ export const checkValidMoveSpecialCases = (
 ): boolean => {
     if (!possibleMove.singleConfig) return true;
     let isValidMove = true;
-    const { mustBeNotMovedRook, mustBeEmptyCoordinates, mustNotBeInCheck } = possibleMove.singleConfig;
+    const { mustBeNotMovedRookCoordinates, mustBeEmptyCoordinates, mustNotBeInCheckCoordinates } = possibleMove.singleConfig;
 
     if (!possibleMove.blockCheckVerify) {
         if (wouldBeInCheck(board, square, moveCheck.move)) {
             isValidMove = false;
         }
-        if (mustNotBeInCheck?.length) {
-            mustNotBeInCheck.forEach((coordinate: CoordinateModel) => {
+        if (possibleMove.mustNotBeInCheck && wouldBeInCheck(board, square, null)) {
+            isValidMove = false;
+        }
+        if (mustNotBeInCheckCoordinates?.length) {
+            mustNotBeInCheckCoordinates.forEach((coordinate: CoordinateModel) => {
                 if (wouldBeInCheck(board, square, { ...coordinate, type: MoveType.NORMAL })) {
                     isValidMove = false;
                 }
             });
         }
     }
-    if (mustBeNotMovedRook?.length) {
-        mustBeNotMovedRook.forEach((coordinate: CoordinateModel) => {
+    if (mustBeNotMovedRookCoordinates?.length) {
+        mustBeNotMovedRookCoordinates.forEach((coordinate: CoordinateModel) => {
             if (!checkIfRookAndNotMoved(board.getSquareOnCoordinate(coordinate)?.piece)) {
                 isValidMove = false;
             }

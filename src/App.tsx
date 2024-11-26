@@ -7,10 +7,9 @@ import { PlayerColor } from './models/PlayerModel';
 import { MoveModel } from './models/MoveModel';
 import MoveHistory from './components/MoveHistory';
 import PromotionChoice from './components/PromotionChoice';
-import { PieceType } from './constants/piece-info';
+import { PieceType } from './models/piece/PieceType';
 import GameModel from './models/GameModel';
-
-import './App.css';
+import WinnerBanner from './components/WinnerBanner';
 
 const App = () => {
     const [key, setKey] = useState(0);
@@ -18,6 +17,7 @@ const App = () => {
 
     const selectPromotionPiece = (type: PieceType): void => {
         game.selectPromotionPiece(type);
+        setKey((currentKey) => currentKey + 1);
     };
 
     const movePiece = (currentSquare: SquareModel, finalSquare: SquareModel, move: MoveModel | undefined): void => {
@@ -27,12 +27,8 @@ const App = () => {
 
     return (
         <div key={key} className='max-w-xl w-3/4 my-4 mx-auto'>
-            <Board
-                game={game}
-                playingAsWhite
-                blockMoves={!!game.promotionCoordinates}
-                movePiece={movePiece}
-            />
+            {game.winner && <WinnerBanner color={game.winner} />}
+            <Board game={game} playingAsWhite blockMoves={!!game.promotionCoordinates || !!game.winner} movePiece={movePiece} />
             {!!game.promotionCoordinates && (
                 <PromotionChoice isWhitePiece={game.playerTurn === PlayerColor.WHITE} select={selectPromotionPiece} />
             )}

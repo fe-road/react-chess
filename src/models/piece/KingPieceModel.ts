@@ -32,15 +32,15 @@ export default class KingPieceModel extends PieceModel {
 
             // Castle King Side
             possibleMoves.push({
+                mustNotBeInCheck: true,
                 singleConfig: {
                     targetCoordinate: { row: kingRow, column: 6 },
-                    mustBeNotMovedRook: [{ row: kingRow, column: 7 }],
+                    mustBeNotMovedRookCoordinates: [{ row: kingRow, column: 7 }],
                     mustBeEmptyCoordinates: [
                         { row: kingRow, column: 5 },
                         { row: kingRow, column: 6 },
                     ],
-                    mustNotBeInCheck: [
-                        { row: kingRow, column: 4 },
+                    mustNotBeInCheckCoordinates: [
                         { row: kingRow, column: 5 },
                         { row: kingRow, column: 6 },
                     ],
@@ -50,19 +50,19 @@ export default class KingPieceModel extends PieceModel {
 
             // Castle Queen Side
             possibleMoves.push({
+                mustNotBeInCheck: true,
                 singleConfig: {
                     targetCoordinate: { row: kingRow, column: 2 },
-                    mustBeNotMovedRook: [{ row: kingRow, column: 0 }],
+                    mustBeNotMovedRookCoordinates: [{ row: kingRow, column: 0 }],
                     mustBeEmptyCoordinates: [
                         { row: kingRow, column: 1 },
                         { row: kingRow, column: 2 },
                         { row: kingRow, column: 3 },
                     ],
-                    mustNotBeInCheck: [
+                    mustNotBeInCheckCoordinates: [
                         { row: kingRow, column: 1 },
                         { row: kingRow, column: 2 },
                         { row: kingRow, column: 3 },
-                        { row: kingRow, column: 4 },
                     ],
                     moveType: MoveType.CASTLE_QUEEN_SIDE,
                 },

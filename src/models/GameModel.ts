@@ -1,5 +1,5 @@
 import { pieceClasses } from '../constants/piece-info';
-import { getValidMoves } from '../services/move-validation-service';
+import { getAllValidMovesForPlayer, getValidMoves } from '../services/move-validation-service';
 import BoardModel from './BoardModel';
 import { CoordinateModel } from './CoordinateModel';
 import { MoveHistoryModel, MoveModel, MoveType } from './MoveModel';
@@ -11,18 +11,28 @@ import SquareModel from './SquareModel';
 export default class GameModel {
     board: BoardModel;
     playerTurn: PlayerColor;
+    winner: PlayerColor | null;
     moveHistory: Array<MoveHistoryModel>;
     promotionCoordinates: CoordinateModel | null;
 
     constructor() {
         this.board = new BoardModel(null);
         this.playerTurn = PlayerColor.WHITE;
+        this.winner = null;
         this.moveHistory = [];
         this.promotionCoordinates = null;
     }
 
+    checkForWinner = (): void => {
+        const playerValidMoves = getAllValidMovesForPlayer(this.board, this.playerTurn, false);
+        if (!playerValidMoves.length) {
+            this.winner = this.playerTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+        }
+    };
+
     switchPlayerTurn = (): void => {
         this.playerTurn = this.playerTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+        this.checkForWinner();
     };
 
     getLastMove = (): MoveHistoryModel | undefined => {
@@ -76,14 +86,14 @@ export default class GameModel {
             if (move?.type === MoveType.CASTLE_QUEEN_SIDE) {
                 this.makeRookCastleMove(piece, 0, 3);
             }
-            // if (move?.type === MoveType.EN_PASSANT) {
-            //     const row = piece.isWhitePiece() ? finalSquare.coordinates.row - 1 : finalSquare.coordinates.row + 1;
-            //     board.updateSquarePiece({ row, column: finalSquare.coordinates.column }, null);
-            // }
-            // if (move?.type === MoveType.PROMOTION) {
-            //     setPromotionCoordinates(finalSquare.coordinates);
-            //     return;
-            // }
+            if (move?.type === MoveType.EN_PASSANT) {
+                const row = piece.isWhitePiece() ? finalSquare.coordinates.row - 1 : finalSquare.coordinates.row + 1;
+                this.board.updateSquarePiece({ row, column: finalSquare.coordinates.column }, null);
+            }
+            if (move?.type === MoveType.PROMOTION) {
+                this.promotionCoordinates = finalSquare.coordinates;
+                return;
+            }
             this.switchPlayerTurn();
         }
     };

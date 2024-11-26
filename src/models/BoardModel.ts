@@ -5,7 +5,6 @@ import { initialPiecePositions } from '../constants/initial-piece-positions';
 import { CoordinateModel } from './CoordinateModel';
 import { isSameCoordinate } from '../services/coordinate-service';
 import { pieceClasses } from '../constants/piece-info';
-import { MoveModel } from './MoveModel';
 
 export default class BoardModel {
     squares: Array<SquareModel> = [];
